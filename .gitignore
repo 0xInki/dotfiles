@@ -1,0 +1,8 @@
+# Ignore Lazy.nvim plugin downloads
+lua/lazy-lock.json
+
+# But in case plugins are stored in nvim/lazy/, ignore them:
+lazy/
+plugins/
+pack/
+site/
