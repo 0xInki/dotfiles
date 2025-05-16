@@ -117,6 +117,56 @@ alias ezsh="vim ~/dotfiles/.zshrc"
 alias etmux="vim ~/dotfiles/.tmux.conf"
 alias evim="vim ~/dotfiles/nvim/init.lua"
 
+# open file in vim after fzf
+# fvim() {
+#   local target
+#  target="$(fzf)" || return  # exit if cancelled
+# 
+#  if [ -z "$target" ]; then
+#   return
+#   elif [ -d "$target" ]; then
+#     cd "$target" || echo "Failed to cd into $target"
+#   elif [ -f "$target" ]; then
+#     vim "$target"
+#   else
+#     echo "Selected item is neither a file nor a directory: $target"
+#   fi
+# }
+
+fvim() {
+  local target action
+
+  # Run fzf with a custom key binding Ctrl-d to select a directory
+  # Enter (default) selects file, Ctrl-d selects directory
+  target=$(fzf --expect=ctrl-d) || return
+
+  # The first line of output is the key pressed
+  action=$(head -1 <<< "$target")
+  # The second line is the selected file/folder path
+  target=$(tail -1 <<< "$target")
+
+  # If no selection, exit
+  [ -z "$target" ] && return
+
+  if [ "$action" = "ctrl-d" ]; then
+    # If Ctrl-d pressed, cd into folder if it is directory
+    if [ -d "$target" ]; then
+      cd "$target" || echo "Failed to cd into $target"
+    else
+      echo "'$target' is not a directory"
+    fi
+  else
+    # Default Enter pressed: open file if it exists
+    if [ -f "$target" ]; then
+      vim "$target"
+    else
+      echo "'$target' is not a file"
+    fi
+  fi
+}
+
+
+
 eval $(thefuck --alias)
 
 export NVM_DIR="$HOME/.nvm"
