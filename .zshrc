@@ -179,13 +179,31 @@ RPROMPT='$(git_status_prompt)'
 # CUSTOM GIT MESSAGES
 source ~/dotfiles/git-messages.zsh
 
-git() {
+function git() {
+  local exit_code
+
   if [[ $1 == "push" ]]; then
-    command git "$@" && git_push_message || git_push_fail
+    command git "$@"
+    exit_code=$?
+    [[ $exit_code -eq 0 ]] && git_push_message || git_push_fail
+    return $exit_code
+
   elif [[ $1 == "commit" ]]; then
-    command git "$@" && git_commit_message || git_commit_fail
+    command git "$@"
+    exit_code=$?
+    [[ $exit_code -eq 0 ]] && git_commit_message || git_commit_fail
+    return $exit_code
+
   elif [[ $1 == "pull" ]]; then
-    command git "$@" && git_pull_message || git_pull_fail
+    command git "$@"
+    exit_code=$?
+    [[ $exit_code -eq 0 ]] && git_pull_message || git_pull_fail
+    return $exit_code
+
+  elif [[ $1 == "status" ]]; then
+    git_status_art
+    return $?
+
   else
     command git "$@"
   fi
