@@ -88,7 +88,11 @@ vim.o.confirm = true
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 
 -- Diagnostic keymaps
-vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
+vim.keymap.set("n", "<leader>z", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
+
+vim.keymap.set("n", "<leader>w", ":w<CR>", { noremap = true })
+vim.keymap.set("n", "<leader>q", ":q<CR>", { noremap = true })
+vim.keymap.set("n", "<leader>wq", ":wq<CR>", { noremap = true })
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -196,6 +200,45 @@ require("lazy").setup({
 				changedelete = { text = "~" },
 			},
 		},
+	},
+	{
+		"stevearc/oil.nvim",
+		dependencies = { "nvim-tree/nvim-web-devicons" },
+		config = function()
+			CustomOilBar = function()
+				local path = vim.fn.expand("%")
+				path = path:gsub("oil://", "")
+
+				return "  " .. vim.fn.fnamemodify(path, ":.")
+			end
+
+			require("oil").setup({
+				columns = { "icon" },
+				keymaps = {
+					["<C-h>"] = false,
+					["<C-l>"] = false,
+					["<C-k>"] = false,
+					["<C-j>"] = false,
+					["<M-h>"] = "actions.select_split",
+				},
+				win_options = {
+					winbar = "%{v:lua.CustomOilBar()}",
+				},
+				view_options = {
+					show_hidden = true,
+					is_always_hidden = function(name, _)
+						local folder_skip = { "dev-tools.locks", "dune.lock", "_build" }
+						return vim.tbl_contains(folder_skip, name)
+					end,
+				},
+			})
+
+			-- Open parent directory in current window
+			vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
+
+			-- Open parent directory in floating window
+			vim.keymap.set("n", "<space>-", require("oil").toggle_float)
+		end,
 	},
 
 	-- NOTE: Plugins can also be configured to run Lua code when they are loaded.

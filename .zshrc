@@ -1,14 +1,6 @@
-# If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Run on init
-
-cd
-
-# Auto-start tmux only if not already in a tmux session
-if command -v tmux &> /dev/null && [[ -z "$TMUX" ]]; then
-  tmux
-fi
 
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
@@ -76,10 +68,14 @@ plugins=(
   npm
   jump
   tmux
-  copypath
 )
 
 source $ZSH/oh-my-zsh.sh
+
+# Disable bracketed-paste-magic loaded by oh-my-zsh/lib/misc.zsh
+zle -D bracketed-paste 2>/dev/null
+unfunction bracketed-paste-magic 2>/dev/null
+
 
 # User configuration
 
@@ -114,24 +110,12 @@ alias vim='nvim'
 alias qq='exit'
 alias c='copypath'
 alias ezsh="vim ~/dotfiles/.zshrc"
-alias etmux="vim ~/dotfiles/.tmux.conf"
+alias szsh="source ~/.zshrc"
+alias etmux="vim ~/.tmux.conf"
+alias stmux="source ~/.tmux.conf"
 alias evim="vim ~/dotfiles/nvim/init.lua"
-
-# open file in vim after fzf
-# fvim() {
-#   local target
-#  target="$(fzf)" || return  # exit if cancelled
-# 
-#  if [ -z "$target" ]; then
-#   return
-#   elif [ -d "$target" ]; then
-#     cd "$target" || echo "Failed to cd into $target"
-#   elif [ -f "$target" ]; then
-#     vim "$target"
-#   else
-#     echo "Selected item is neither a file nor a directory: $target"
-#   fi
-# }
+alias svim="source ~/nvim/init.lua"
+alias j='jump'
 
 fvim() {
   local target action
@@ -165,15 +149,11 @@ fvim() {
   fi
 }
 
-
-
 eval $(thefuck --alias)
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-PATH=$PATH:/Android/bin;export PATH;
 
 export ANDROID_HOME=$HOME/Library/Android/sdk
 export PATH=$PATH:$ANDROID_HOME/emulator
@@ -182,85 +162,12 @@ export PATH=$PATH:$ANDROID_HOME/tools/bin
 export PATH=$PATH:$ANDROID_HOME/platform-tools
 export PATH="/opt/homebrew/bin:$PATH"
 
-
-export PATH="/home/boehme/.nvm/versions/node/v10.1.0/bin:/home/boehme/bin:/home/boehme/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/lib/jvm/java-8-oracle/bin:/usr/lib/jvm/java-8-oracle/db/bin:/usr/lib/jvm/java-8-oracle/jre/bin:/Android/bin:/home/boehme/Android/Sdk/tools:/home/boehme/Android/Sdk/tools/bin:/home/boehme/Android/Sdk/platform-tools:/home/boehme/android-studio/bin:/home/boehme/.vimpkg/bin"
-
-# Adiciona o caminho correto do rbenv dependendo da instalação disponível
-if [ -d "/opt/homebrew/bin" ]; then
-  export PATH="/opt/homebrew/bin:$PATH"
-elif [ -d "$HOME/.rbenv/bin" ]; then
-  export PATH="$HOME/.rbenv/bin:$PATH"
-fi
-
-# Só inicializa rbenv se o binário estiver disponível
-if command -v rbenv >/dev/null 2>&1; then
-  eval "$(rbenv init - zsh)"
-fi
-
-export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"
-
 export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
-
-#CUSTOM PROMPT
-PS1='%F{white}[%F{202}%c%F{white}]%f %F{202}火%f '
-
-git_status_prompt() {
-  if git rev-parse --is-inside-work-tree &>/dev/null; then
-    local branch=$(git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short HEAD 2>/dev/null)
-    local dirty=""
-    local staged=""
-    local ahead=""
-    
-    # Check uncommitted changes
-    if [[ -n $(git status --porcelain 2>/dev/null) ]]; then
-      dirty="%F{white}*%f"
-    fi
-    
-    # Check staged changes
-    git diff --cached --quiet --ignore-submodules -- . || staged="%F{white}+%f"
-    
-    # Check if ahead of remote
-    if [[ $(git rev-list --count @{upstream}..HEAD 2>/dev/null) -gt 0 ]]; then
-      ahead="%F{white}↑%f"
-    fi
-    
-    echo "%F{202}${branch}%f${dirty}${staged}${ahead}"
-  else
-    echo ""
-  fi
-}
-
-RPROMPT='$(git_status_prompt)'
 
 # CUSTOM GIT MESSAGES
 source ~/dotfiles/git-messages.zsh
 
-function git() {
-  local exit_code
+#CUSTOM PROMPT
+PS1='%F{white}[%F{202}%c%F{white}]%f %F{202}火%f '
 
-  if [[ $1 == "push" ]]; then
-    command git "$@"
-    exit_code=$?
-    [[ $exit_code -eq 0 ]] && git_push_message || git_push_fail
-    return $exit_code
-
-  elif [[ $1 == "commit" ]]; then
-    command git "$@"
-    exit_code=$?
-    [[ $exit_code -eq 0 ]] && git_commit_message || git_commit_fail
-    return $exit_code
-
-  elif [[ $1 == "pull" ]]; then
-    command git "$@"
-    exit_code=$?
-    [[ $exit_code -eq 0 ]] && git_pull_message || git_pull_fail
-    return $exit_code
-
-  elif [[ $1 == "status" ]]; then
-    git_status_art
-    return $?
-
-  else
-    command git "$@"
-  fi
-}
+RPROMPT='$(git_status_prompt)'

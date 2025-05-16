@@ -1,5 +1,61 @@
 # ~/.config/git-messages.zsh
 
+git_status_prompt() {
+  if git rev-parse --is-inside-work-tree &>/dev/null; then
+    local branch=$(git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short HEAD 2>/dev/null)
+    local dirty=""
+    local staged=""
+    local ahead=""
+    
+    # Check uncommitted changes
+    if [[ -n $(git status --porcelain 2>/dev/null) ]]; then
+      dirty="%F{white}*%f"
+    fi
+    
+    # Check staged changes
+    git diff --cached --quiet --ignore-submodules -- . || staged="%F{white}+%f"
+    
+    # Check if ahead of remote
+    if [[ $(git rev-list --count @{upstream}..HEAD 2>/dev/null) -gt 0 ]]; then
+      ahead="%F{white}↑%f"
+    fi
+    
+    echo "%F{202}${branch}%f${dirty}${staged}${ahead}"
+  else
+    echo ""
+  fi
+}
+
+git() {
+  local exit_code
+
+  if [[ $1 == "push" ]]; then
+    command git "$@"
+    exit_code=$?
+    [[ $exit_code -eq 0 ]] && git_push_message || git_push_fail
+    return $exit_code
+
+  elif [[ $1 == "commit" ]]; then
+    command git "$@"
+    exit_code=$?
+    [[ $exit_code -eq 0 ]] && git_commit_message || git_commit_fail
+    return $exit_code
+
+  elif [[ $1 == "pull" ]]; then
+    command git "$@"
+    exit_code=$?
+    [[ $exit_code -eq 0 ]] && git_pull_message || git_pull_fail
+    return $exit_code
+
+  elif [[ $1 == "status" ]]; then
+    git_status_art
+    return $?
+
+  else
+    command git "$@"
+  fi
+}
+
 git_push_message() {
 	if git rev-parse --git-dir > /dev/null 2>&1; then
 		if [ $? -eq 0 ]; then
