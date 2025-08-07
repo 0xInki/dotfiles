@@ -105,6 +105,7 @@ unfunction bracketed-paste-magic 2>/dev/null
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+alias v='nvim'
 alias vi='nvim'
 alias vim='nvim'
 alias qq='exit'
@@ -116,6 +117,17 @@ alias stmux="source ~/.tmux.conf"
 alias evim="vim ~/dotfiles/nvim/init.lua"
 alias svim="source ~/nvim/init.lua"
 alias j='jump'
+
+dev() {
+  echo "Running: npm run dev"
+  output=$(npm run dev 2>&1)
+  echo "$output"
+
+  if echo "$output" | grep -i -q 'missing script: ["'\'']\?dev["'\'']\?'; then
+    echo "Script 'dev' not found. Falling back to: npm run start-dev"
+    npm run start-dev
+  fi
+}
 
 fvim() {
   local target action
@@ -171,3 +183,4 @@ source ~/dotfiles/git-messages.zsh
 PS1='%F{white}[%F{202}%c%F{white}]%f %F{202}火%f '
 
 RPROMPT='$(git_status_prompt)'
+DISABLE_BRACKETED_PASTE="true"
