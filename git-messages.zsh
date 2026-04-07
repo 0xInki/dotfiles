@@ -132,6 +132,12 @@ git_pull_fail() {
 	echo ""
 }
 
+# Override oh-my-zsh gcm alias (git checkout main) para git commit -m
+unalias gcm 2>/dev/null
+gcm() {
+  git commit -m "$*"
+}
+
 git_status_art() {
 	if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
 		echo ""
