@@ -2,4 +2,48 @@
 --  I promise not to create any merge conflicts in this directory :)
 --
 -- See the kickstart.nvim README for more information
-return {}
+
+---@module 'lazy'
+---@type LazySpec
+return {
+
+  -- ============================================================
+  -- CODE BRIDGE
+  -- Integração entre o editor e ferramentas externas de código
+  -- https://github.com/samir-roy/code-bridge.nvim
+  -- ============================================================
+  {
+    'samir-roy/code-bridge.nvim',
+    config = function()
+      require('code-bridge').setup()
+    end,
+  },
+
+  -- ============================================================
+  -- COPILOT
+  -- Sugestões de código com IA do GitHub Copilot
+  -- Após instalar, rode :Copilot setup para autenticar
+  -- https://github.com/github/copilot.vim
+  -- ============================================================
+  {
+    'github/copilot.vim',
+  },
+
+  -- ============================================================
+  -- ARROW
+  -- Bookmarks rápidos de arquivos e posições no buffer
+  -- ';' abre o menu global | 'm' abre o menu por buffer
+  -- https://github.com/otavioschwanck/arrow.nvim
+  -- ============================================================
+  {
+    'otavioschwanck/arrow.nvim',
+    dependencies = {
+      { 'nvim-tree/nvim-web-devicons' },
+    },
+    opts = {
+      show_icons = true,
+      leader_key = ';',
+      buffer_leader_key = 'm',
+    },
+  },
+}

@@ -4,6 +4,7 @@
 
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
+echo "inicio"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -114,9 +115,12 @@ alias ezsh="vim ~/dotfiles/.zshrc"
 alias szsh="source ~/.zshrc"
 alias etmux="vim ~/.tmux.conf"
 alias stmux="source ~/.tmux.conf"
-alias evim="vim ~/dotfiles/nvim/init.lua"
+alias evim="vim ~/nvim/init.lus"
 alias svim="source ~/nvim/init.lua"
 alias j='jump'
+alias gcm='git commit -m'
+
+echo "after alias"
 
 dev() {
   echo "Running: npm run dev"
@@ -129,43 +133,15 @@ dev() {
   fi
 }
 
-fvim() {
-  local target action
-
-  # Run fzf with a custom key binding Ctrl-d to select a directory
-  # Enter (default) selects file, Ctrl-d selects directory
-  target=$(fzf --expect=ctrl-d) || return
-
-  # The first line of output is the key pressed
-  action=$(head -1 <<< "$target")
-  # The second line is the selected file/folder path
-  target=$(tail -1 <<< "$target")
-
-  # If no selection, exit
-  [ -z "$target" ] && return
-
-  if [ "$action" = "ctrl-d" ]; then
-    # If Ctrl-d pressed, cd into folder if it is directory
-    if [ -d "$target" ]; then
-      cd "$target" || echo "Failed to cd into $target"
-    else
-      echo "'$target' is not a directory"
-    fi
-  else
-    # Default Enter pressed: open file if it exists
-    if [ -f "$target" ]; then
-      vim "$target"
-    else
-      echo "'$target' is not a file"
-    fi
-  fi
-}
-
 eval $(thefuck --alias)
 
+echo "after thefuck"
+
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"
+[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
+
+echo "after nvm"
 
 export ANDROID_HOME=$HOME/Library/Android/sdk
 export PATH=$PATH:$ANDROID_HOME/emulator
@@ -176,6 +152,8 @@ export PATH="/opt/homebrew/bin:$PATH"
 
 export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
 
+echo "after export paths"
+
 # CUSTOM GIT MESSAGES
 source ~/dotfiles/git-messages.zsh
 
@@ -184,3 +162,4 @@ PS1='%F{white}[%F{202}%c%F{white}]%f %F{202}火%f '
 
 RPROMPT='$(git_status_prompt)'
 DISABLE_BRACKETED_PASTE="true"
+echo "Final"
